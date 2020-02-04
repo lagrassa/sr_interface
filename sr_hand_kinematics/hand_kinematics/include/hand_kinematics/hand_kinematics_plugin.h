@@ -157,10 +157,10 @@ virtual bool getPositionFK(const std::vector<std::string> &link_names,
 * @brief  Initialization function for the kinematics
 * @return True if initialization was successful, false otherwise
 */
-virtual bool initialize(const std::string &robot_description,
+virtual bool initialize(moveit::core::RobotModel& robot_model,
                         const std::string &group_name,
                         const std::string &base_frame,
-                        const std::string &tip_frame,
+                        const std::vector<std::string>& tip_frames,
                         double search_discretization);
 
 
@@ -188,6 +188,7 @@ moveit_msgs::KinematicSolverInfo solver_info_;
 std::string finger_base_name;
 int dimension_;
 boost::shared_ptr<KDL::ChainFkSolverPos_recursive> jnt_to_pose_solver_;
+std::string tip_frame_;
 
 KDL::Chain_coupling kdl_chain_;
 

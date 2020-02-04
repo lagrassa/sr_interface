@@ -89,18 +89,19 @@ namespace hand_kinematics
     return false;
   }
 
-  bool HandKinematicsPlugin::initialize(const std::string &robot_description,
+  bool HandKinematicsPlugin::initialize(moveit::core::RobotModel& robot_model,
                                         const std::string &group_name,
                                         const std::string &base_frame,
-                                        const std::string &tip_frame,
+                                        const std::vector<std::string>& tip_frames,
                                         double search_discretization)
   {
-    setValues(robot_description, group_name, base_frame, tip_frame, search_discretization);
-    urdf::Model robot_model;
+    storeValues(robot_model, group_name, base_frame, tip_frames, search_discretization);
+    urdf::Model robot_model_urdf;
     std::string xml_string;
     ros::NodeHandle private_handle("~/" + group_name);
+    tip_frame_ = tip_frames_[0];
     ROS_INFO("Started IK for %s", tip_frame_.c_str());
-    while (!loadRobotModel(private_handle, robot_model, base_frame_, tip_frame_, xml_string) && private_handle.ok())
+    while (!loadRobotModel(private_handle, robot_model_urdf, base_frame_, tip_frame_, xml_string) && private_handle.ok())
     {
       ROS_ERROR("Could not load robot model. Are you sure the robot model is on the parameter server?");
       ros::Duration(0.5).sleep();
@@ -190,7 +191,7 @@ namespace hand_kinematics
 
     ROS_DEBUG("IK Solver, maxIterations: %d, epsilon: %f, lambda: %f", maxIterations, epsilon, lambda);
 
-    init_ik(robot_model, base_frame_, tip_frame_, joint_min_, joint_max_, ik_solver_info_);
+    init_ik(robot_model_urdf, base_frame_, tip_frame_, joint_min_, joint_max_, ik_solver_info_);
     // Build Solvers
     ROS_DEBUG("Advertising services");
     fk_solver = new KDL::ChainFkSolverPos_recursive(kdl_chain_);
