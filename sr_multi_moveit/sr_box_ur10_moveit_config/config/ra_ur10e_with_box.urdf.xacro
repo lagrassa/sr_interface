@@ -7,7 +7,7 @@
 
   <xacro:ur10e_robot prefix="ra_" joint_limited="true"
     transmission_hw_interface="$(arg transmission_hw_interface)"
-    kinematics_file="${load_yaml('$(arg kinematics_config)')}"
+    kinematics_config="$(arg kinematics_config)"}"
   />
   <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
