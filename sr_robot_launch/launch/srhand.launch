@@ -127,8 +127,15 @@
 
   <!-- MOVEIT -->
   <group if="$(arg use_moveit)">
-    <node pkg="sr_utilities_common" type="timed_roslaunch.sh" args="15 sr_moveit_hand_config moveit_planning_and_execution.launch
-      gui:=$(arg gui) hand_ik_solver:=$(arg hand_ik_solver)" name="timed_roslaunch" output="screen"/>
+    <node name="conditional_delayed_rostool" pkg="sr_utilities_common" type="conditional_delayed_rostool.py" output="screen">
+      <param name="package_name" value="sr_moveit_hand_config" />
+      <param name="executable_name" value="moveit_planning_and_execution.launch" />
+      <param name="executable_type" value="launch" />
+      <rosparam param="topics_list">[/rh_trajectory_controller/command]</rosparam>
+      <rosparam param="params_list">[/robot_description]</rosparam>
+      <param name="launch_args_list" value="gui:=$(arg gui) hand_ik_solver:=$(arg hand_ik_solver)" />
+      <param name="timeout" value="60.0" />
+    </node>
     <include file="$(find sr_moveit_hand_config)/launch/default_warehouse_db.launch"/>
   </group>
 
