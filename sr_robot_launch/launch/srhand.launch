@@ -75,12 +75,12 @@
     </include>
     <param name="/hand/mapping/$(arg hand_serial)" value="$(arg hand_id)"/>
     <param name="/hand/joint_prefix/$(arg hand_serial)" value="$(arg hand_id)_"/>
-    <param name="robot_description" command="xacro --inorder $(arg robot_description)"/>
+    <param name="robot_description" command="xacro $(arg robot_description)"/>
     <node name="spawn_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model usrh -z 0.0 " respawn="false" output="screen"/>
     <group if="$(eval arg('hand_type') == 'hand_e' or arg('hand_type') == 'hand_e_plus')">
       <rosparam if="$(arg variable_controller)" command="load" file="$(find sr_description)/hand/config/$(arg hand_id)_variable_pid_controller_gazebo.yaml"/>
       <rosparam unless="$(arg grasp_controller)" command="load" file="$(find sr_description)/hand/config/$(arg hand_id)_controller_gazebo.yaml"/>
-      <rosparam if="$(arg grasp_controller)" command="load" file="$(find sr_description)/hand/config/$(arg hand_id)_grasp_controller_gazebo.yaml"/>
+      <rosparam if="$(arg grasp_controller)" command="load" file="$(find sr_description)/hand/config/$(arg hand_id)_hybrid_controller_gazebo.yaml"/>
     </group>
     <group if="$(eval arg('hand_type') == 'hand_g')">
       <rosparam unless="$(arg grasp_controller)" command="load" file="$(find sr_description)/hand/config/$(arg hand_id)_controller_gazebo.yaml"/>
@@ -104,7 +104,14 @@
         </node>
       </group>
       <group if="$(arg grasp_controller)">
-        <node name="$(arg hand_id)_grasp_controller" pkg="sr_utilities" type="grasp_controller_spawner.py" output="screen" />
+        <node name="$(arg hand_id)_grasp_controller" pkg="sr_utilities" type="controller_spawner.py" output="screen">
+          <param name="controller_to_start" value ="sh_rh_hybrid_controller"/>
+        </node>
+        <node name="$(arg hand_id)_trajectory_controller" pkg="sr_utilities" type="trajectory_controller_spawner.py" output="screen">
+          <param name="hand_trajectory" value ="$(arg hand_trajectory)"/>
+          <param name="variable_controller" value="$(arg variable_controller)"/>
+          <param name="variable_controller_only_joint_0" value="$(arg variable_controller_only_joint_0)"/>
+        </node>
       </group>
     </group>
   </group>
