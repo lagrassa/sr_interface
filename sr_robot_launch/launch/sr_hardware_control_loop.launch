@@ -88,9 +88,14 @@
       </node>
     </group>
     <group if="$(arg grasp_controller)">
-      <node name="$(arg hand_id)_grasp_controller" pkg="sr_utilities" type="grasp_controller_spawner.py" output="screen">
-        <param name="wait_for" value ="calibrated"/>
-      </node>
+        <node name="$(arg hand_id)_grasp_controller" pkg="sr_utilities" type="controller_spawner.py" output="screen">
+          <param name="controller_to_start" value ="sh_rh_hybrid_controller"/>
+        </node>
+        <node name="$(arg hand_id)_trajectory_controller" pkg="sr_utilities" type="trajectory_controller_spawner.py" output="screen">
+          <param name="hand_trajectory" value ="$(arg hand_trajectory)"/>
+          <param name="variable_controller" value="false"/>
+          <param name="variable_controller_only_joint_0" value="false"/>
+        </node>
     </group>
   </group>
 
