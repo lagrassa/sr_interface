@@ -24,6 +24,7 @@ from sr_robot_msgs.srv import (ChangeControlType, RobotTeachMode,
 class ControllerHelper(object):
 
     def __init__(self, robot_ids, robot_joint_prefixes):
+        rospy.logerr("#################### teach_mode_node: ControllerHelper __init__")
         self.time_to_reload_params = 6.0
         self.robot_ids = robot_ids
         self.robot_joint_prefixes = robot_joint_prefixes
@@ -64,6 +65,7 @@ class ControllerHelper(object):
         """
         Switch the current controller
         """
+        rospy.logerr("#################### teach_mode_node: ControllerHelper _change_ctrl")
         success = True
         list_controllers = rospy.ServiceProxy(
             'controller_manager/list_controllers', ListControllers)
@@ -108,9 +110,11 @@ class ControllerHelper(object):
         return success
 
     def change_hand_ctrl(self, controller):
+        rospy.logerr("#################### teach_mode_node: ControllerHelper change_hand_ctrl")
         return self._change_ctrl(self.hand_controllers[controller], self.managed_hand_controllers)
 
     def change_trajectory_ctrl(self, controller):
+        rospy.logerr("#################### teach_mode_node: ControllerHelper change_trajectory_ctrl")
         return self._change_ctrl(self.trajectory_controllers[controller],
                                  self.managed_trajectory_controllers)
 
@@ -122,6 +126,7 @@ class ControllerHelper(object):
             - PWM (sr_robot_msgs::ControlType::PWM)
         it will block for time_to_reload_params secs to allow hand_controllers parameters to be updated
         """
+        rospy.logerr("#################### teach_mode_node: ControllerHelper change_force_ctrl_type")
         success = True
         for hand_id in self.robot_ids:
             change_control_type = rospy.ServiceProxy(
@@ -142,6 +147,7 @@ class ControllerHelper(object):
         return success
 
     def change_arm_teach_mode(self, teach_mode):
+        rospy.logerr("#################### teach_mode_node: ControllerHelper change_arm_teach_mode")
         success = True
 #         set_teach_msg = SetTeachMode()
 #         set_teach_msg.teach_mode = teach_mode
@@ -161,6 +167,7 @@ class ControllerHelper(object):
 class TeachModeManager(object):
 
     def __init__(self):
+        rospy.logerr("#################### teach_mode_node: TeachModeManager __init__")
         self.s = rospy.Service('teach_mode', RobotTeachMode, self.teach_mode)
         self.ctrl_helpers = {"right_hand": ControllerHelper(["rh"], ["rh_"]),
                              "left_hand": ControllerHelper(["lh"], ["lh_"]),
@@ -170,8 +177,9 @@ class TeachModeManager(object):
         self.modes = ["TRAJECTORY_MODE", "TEACH_MODE", "POSITION_MODE", "GRASP_MODE"]
 
     def teach_mode(self, req):
-
+        rospy.logerr("#################### teach_mode_node: TeachModeManager teach_mode")
         if req.robot == "right_arm" or req.robot == "left_arm":
+            rospy.logerr("#################### teach_mode_node: TeachModeManager if robot is arm")
             if req.teach_mode == RobotTeachModeRequest.TRAJECTORY_MODE \
                     or req.teach_mode == RobotTeachModeRequest.POSITION_MODE:
 
@@ -210,12 +218,13 @@ class TeachModeManager(object):
                 return RobotTeachModeResponse(RobotTeachModeResponse.ERROR)
 
         elif req.robot == "right_hand" or req.robot == "left_hand":
+            rospy.logerr("#################### teach_mode_node: TeachModeManager if robot is hand")
             change_type_msg = ChangeControlType()
             if req.teach_mode == RobotTeachModeRequest.TRAJECTORY_MODE \
                     or req.teach_mode == RobotTeachModeRequest.POSITION_MODE:
 
                 change_type_msg.control_type = ControlType.PWM
-                rospy.loginfo("Changing %s Control mode to PWM", req.robot)
+                rospy.loginfo("###########Changing %s Control mode to PWM", req.robot)
                 self.ctrl_helpers[
                     req.robot].change_force_ctrl_type(change_type_msg)
                 rospy.loginfo("Changing %s controllers to position", req.robot)
@@ -234,13 +243,13 @@ class TeachModeManager(object):
 
             elif req.teach_mode == RobotTeachModeRequest.TEACH_MODE:
                 change_type_msg.control_type = ControlType.FORCE
-                rospy.loginfo("Changing %s Control mode to FORCE", req.robot)
+                rospy.loginfo("###########################Changing %s Control mode to FORCE", req.robot)
                 self.ctrl_helpers[
                     req.robot].change_force_ctrl_type(change_type_msg)
-                rospy.loginfo("Changing %s controllers to effort", req.robot)
+                rospy.loginfo("###########################Changing %s controllers to effort", req.robot)
                 self.ctrl_helpers[req.robot].change_hand_ctrl("effort")
                 rospy.loginfo(
-                    "Changing %s trajectory controllers to STOP", req.robot)
+                    "###########################Changing %s trajectory controllers to STOP", req.robot)
                 self.ctrl_helpers[req.robot].change_trajectory_ctrl("stop")
 
                 return RobotTeachModeResponse(RobotTeachModeResponse.SUCCESS)
