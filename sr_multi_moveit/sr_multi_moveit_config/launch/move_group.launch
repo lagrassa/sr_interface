@@ -48,9 +48,9 @@
   </include>
 
   <!-- Sensors Functionality -->
-  <include ns="move_group" file="$(find sr_multi_moveit_config)/launch/sensor_manager.launch.xml" if="$(arg allow_trajectory_execution)">
+  <!-- <include ns="move_group" file="$(find sr_multi_moveit_config)/launch/sensor_manager.launch.xml" if="$(arg allow_trajectory_execution)">
     <arg name="moveit_sensor_manager" value="shadowrobot_motor" /> 
-  </include>
+  </include> -->
 
   <!-- Start the actual move_group node/action server -->
   <node pkg="sr_utilities_common" type="timed_roslaunch.sh" args="5 sr_multi_moveit_config move_group_action_server.launch 
