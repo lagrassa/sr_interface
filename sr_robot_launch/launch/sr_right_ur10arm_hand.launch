@@ -33,8 +33,8 @@
 
   <!-- ROBOT CONFIG-->
   <arg name="side" default="right"/>
-  <arg name="robot_description" default="'$(find sr_multi_description)/urdf/right_srhand_ur10.urdf.xacro'"/>
-  <arg name="robot_config_file" default="$(find sr_multi_moveit_config)/config/robot_configs/right_sh_ur10.yaml"/>
+  <arg name="robot_description" default="'$(find sr_multi_description)/urdf/right_srhand_ur10_biotacs.urdf.xacro'"/>
+  <arg name="robot_config_file" default="$(find sr_multi_moveit_config)/config/robot_configs/right_sh_ur10_biotac.yaml"/>
 
   <!-- HAND CONFIG-->
   <arg name="hand_serial" default="1082"/>

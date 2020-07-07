@@ -363,6 +363,11 @@ class SRDFRobotGenerator(object):
                             node_attribute = group_element.getAttributeNode("tip_link")
                             node_attribute.nodeValue = (manipulator.hand.prefix + "manipulator")
                         elt.writexml(self.new_robot_srdf, indent="  ", addindent="  ", newl="\n")
+                        elt.setAttribute('name', manipulator.arm.internal_name + "_and_thumb")
+                        for group_element in elt.getElementsByTagName("chain"):
+                            node_attribute = group_element.getAttributeNode("tip_link")
+                            node_attribute.nodeValue = (manipulator.hand.prefix + "thdistal")
+                        elt.writexml(self.new_robot_srdf, indent="  ", addindent="  ", newl="\n")
                     if group_name == manipulator.arm.main_group and (manipulator.has_hand):
                         new_group = xml.dom.minidom.Document().createElement('group')
                         new_group.setAttribute("name", manipulator.arm.internal_name + "_and_hand")
@@ -470,6 +475,12 @@ class SRDFRobotGenerator(object):
                     newElement.getAttributeNode("parent_link").nodeValue = manipulator.hand.prefix + "manipulator"
                     newElement.getAttributeNode("group").nodeValue = manipulator.hand.prefix + "fingers"
                     newElement.setAttribute('parent_group', manipulator.arm.internal_name + "_and_manipulator")
+                    newElement.writexml(self.new_robot_srdf, indent="  ", addindent="  ", newl="\n")
+                    newElement = deepcopy(elt)
+                    newElement.getAttributeNode("name").nodeValue = manipulator.arm.prefix + "and_thumb_ee"
+                    newElement.getAttributeNode("parent_link").nodeValue = manipulator.hand.prefix + "thdistal"
+                    newElement.getAttributeNode("group").nodeValue = manipulator.hand.prefix + "fingers"
+                    newElement.setAttribute('parent_group', manipulator.arm.internal_name + "_and_thumb")
                     newElement.writexml(self.new_robot_srdf, indent="  ", addindent="  ", newl="\n")
                 else:
                     elt.getAttributeNode("name").nodeValue = manipulator.arm.internal_name + "_ee"
